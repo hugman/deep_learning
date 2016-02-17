@@ -1,11 +1,9 @@
 
-Author : Sang Keun Jung (2016)
-
 To Run the scripts in this tutorial, it's better to set following configurations:
-	- install tensorflow 0.6 
-	- ubuntu > 12.04
-	- python 2.7
-	- (recommended) GPU cards and Nvidia drivers. 
+* install tensorflow 0.6 
+* ubuntu > 12.04
+* python 2.7
+* (recommended) GPU cards and Nvidia drivers. 
 
 It's better to investigate source codes in following order 
 	- 1. mnist.py  --> basic block of neural network
