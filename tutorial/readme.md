@@ -13,12 +13,15 @@ It's better to investigate source codes in following order
 4. pos_tagger_rnn_seq.py --> how to change input/output, loss, update of *_fcn_seq.py to use RNN 
 
 2, 3, 4 codes are based on mnist.py 
+
 So some variable names are not changed for better understanding. (ex. var name 'image' instead of 'word' )
 
 For monitoring using tensorbaord:
    You need to launch tensorboard web server as follows:
+   
    <code>
 	$ ./nohup tensorboard --logdir /local/log-tensorboard &
    </code>
+   
    in here, log-tensorboard can be changed by users.
 
