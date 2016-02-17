@@ -3,6 +3,7 @@
   This script handles sentence wise model build, loss and evaluation
 
   Author : Sang Keun Jung (2016)
+           hugmanskj@gmail.com
 
 """
 

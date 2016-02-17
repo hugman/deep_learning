@@ -3,6 +3,7 @@
   This script handles a word as a image ignoring sentence boundary. 
 
   Author : Sang Keun Jung (2016)
+           hugmanskj@gmail.com
 
 """
 

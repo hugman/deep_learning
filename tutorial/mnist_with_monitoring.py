@@ -1,6 +1,7 @@
 ﻿""" Mnist tutorial Code with Monitoring features -- with Tensorboard.
 
   Author : Sang Keun Jung (2016)
+           hugmanskj@gmail.com
 
 """
 

@@ -5,6 +5,7 @@
     - sequence wise update 
 
   Author : Sang Keun Jung (2016)
+           hugmanskj@gmail.com
 
 """
 
