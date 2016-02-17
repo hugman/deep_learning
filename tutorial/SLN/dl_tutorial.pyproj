@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8258e293-2f93-4a1f-9bc5-0670df7959d7}</ProjectGuid>
+    <ProjectHome>..\</ProjectHome>
+    <StartupFile>pos_tagger_fcn.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+    <InterpreterVersion />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="data\data.py" />
+    <Compile Include="mnist.py" />
+    <Compile Include="mnist_with_monitoring.py" />
+    <Compile Include="pos_tagger_fcn.py" />
+    <Compile Include="pos_tagger_fcn_seq.py" />
+    <Compile Include="pos_tagger_rnn_seq.py" />
+    <Compile Include="tf_models\linear.py" />
+    <Compile Include="tf_models\rnn.py" />
+    <Compile Include="tf_models\rnn_cell.py" />
+    <Compile Include="tf_models\seq2seq.py" />
+    <Compile Include="tf_models\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="data\" />
+    <Folder Include="data\SLN\" />
+    <Folder Include="data\SLN\.vs\" />
+    <Folder Include="data\SLN\.vs\data\" />
+    <Folder Include="data\SLN\.vs\data\v14\" />
+    <Folder Include="tf_models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data\readme.txt" />
+    <Content Include="data\SLN\data.pyproj" />
+    <Content Include="readme.txt" />
+  </ItemGroup>
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+</Project>
