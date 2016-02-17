@@ -1,11 +1,12 @@
 
-Data Folder Description
+# Data Folder Description
 
-<Mnist Example>
+## Mnist Example
+
 	- np_image_file.10k.pkl : numpy object - [num_examples , 784]
 	- np_label_file.10k.pkl : numpy object - [num_examples]
 
-<POS Tagging Example>
+## POS Tagging Example
 	- embeddings.txt : default embedding information from SENNA 3.0  - 130,000 word entry
 	- words.lst      : default word list corresponding to embeddings.txt - 130,000 word entry
 
