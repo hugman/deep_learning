@@ -1,10 +1,16 @@
+# Deep learning tutorial codes using Tensorflow
 
+
+
+
+# Configuration
 To Run the scripts in this tutorial, it's better to set following configurations:
 * install tensorflow 0.6 
 * ubuntu > 12.04
 * python 2.7
 * (recommended) GPU cards and Nvidia drivers. 
 
+# Recommended order to check
 It's better to investigate source codes in following order 
 
 1. mnist.py  --> basic block of neural network
@@ -16,6 +22,7 @@ It's better to investigate source codes in following order
 
 So some variable names are not changed for better understanding. (ex. var name 'image' instead of 'word' )
 
+# How to use tensorboard to monitor 
 For monitoring using tensorbaord:
    You need to launch tensorboard web server as follows:
    
