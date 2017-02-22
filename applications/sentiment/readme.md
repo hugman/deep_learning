@@ -20,3 +20,6 @@ Korean Sentiment Analysis data is from
 		- [English] Won-Sik Bae and Jeong-Won Cha, ?쏛utomatic Opinion Relations Extraction for Sentiment Analysis,??Journal of KIISE: Software and Applications, vol. 40, no. 5, pp. 473-481, 2013. (in Korean)
 
 		- [Korean] 배원식, 차정원, “정서분석을 위한 의견관계 자동추출,” 한국정보과학회논문지: 소프트웨어 및 응용, 제40권, 제5호, pp. 473-481, 2013.
+		
+		
+( Overall code structure and some codes are inspired by https://github.com/rafaljozefowicz/lm)
