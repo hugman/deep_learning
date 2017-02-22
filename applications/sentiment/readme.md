@@ -1,4 +1,4 @@
-# Sentiment Analysis TF Example code # 
+# Sentiment Analysis TF Example code 
 
 Author : Sangkeun Jung (2017)
 
@@ -10,6 +10,7 @@ The purpose of this scripts is for educating how to write deep learning building
 	: Positive, Negative, Neutral, Objective
 - character based encoding 
 - use supervisor pattern to deal with model saving & restoring
+- data is filtered ( length < 128 )
 
 Korean Sentiment Analysis data is from 
 
