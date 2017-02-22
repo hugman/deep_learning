@@ -46,17 +46,6 @@ class Sentiment(object):
             return step_outputs
 
         def _sentence_encoding(step_inputs, seq_length, cell_size):
-            f_rnn_cell = tf.nn.rnn_cell.LSTMCell(cell_size)
-            b_rnn_cell = tf.nn.rnn_cell.LSTMCell(cell_size)
-            step_rnn_logits, step_f_rnn_state, step_b_rnn_state = rnn.bidirectional_rnn(f_rnn_cell, 
-                                                                                        b_rnn_cell, 
-                                                                                        step_inputs, 
-                                                                                        dtype=tf.float32, 
-                                                                                        scope='birnn')
-
-            sent_encoding = step_rnn_logits[0]
-
-            """
             f_rnn_cell = tf.nn.rnn_cell.LSTMCell(cell_size, state_is_tuple=True)
             b_rnn_cell = tf.nn.rnn_cell.LSTMCell(cell_size, state_is_tuple=True)
             _inputs = tf.pack(step_inputs, axis=1)
@@ -68,18 +57,15 @@ class Sentiment(object):
                                                              dtype=tf.float32, 
                                                              scope='birnn'
                                                             )
+            
 
             output_fw, output_bw = outputs
             states_fw, states_bw = states
 
-            _concated = tf.concat(1, [output_fw, output_bw])
+            steps_fw = tf.unpack(output_fw, axis=1)
+            steps_bw = tf.unpack(output_bw, axis=1)
 
-            step_concated = tf.unpack(_concated, axis=1)
-            #sent_encoding = tf.concat(1, [step_concated[0], step_concated[-1]]) # [batch_size, cell_size*2]
-            sent_encoding = step_concated[0] # [batch_size]
-            print(sent_encoding)
-            """
-
+            sent_encoding = tf.concat(1, [steps_fw[0], steps_bw[0]]) # [batch_size]
             return sent_encoding
 
         def _to_class(input, num_class):

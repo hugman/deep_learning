@@ -34,9 +34,17 @@ def run_train(dataset, hps, logdir):
         while not sv.should_stop():
             fetches = [model.global_step, model.loss, model.train_op]
             x, y, w = next(data_iterator)
-            fetched = sess.run(fetches, {model.x: x, model.y: y, model.w: w})
 
+            # for monitoring 
+            should_compute_summary = (local_step > 0 and local_step % 20 == 0)
+            if should_compute_summary: fetches += [model.summary_op]
+
+            fetched = sess.run(fetches, {model.x: x, model.y: y, model.w: w})
             local_step += 1
+
+            # update monitoring
+            if should_compute_summary:
+                sv.summary_computed(sess, fetched[-1])
 
             if local_step < 10 or local_step % 10 == 0:
                 cur_time  = time.time()
