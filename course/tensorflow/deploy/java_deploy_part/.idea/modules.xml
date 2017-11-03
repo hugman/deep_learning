@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/skt-nlp-iad.iml" filepath="$PROJECT_DIR$/.idea/modules/skt-nlp-iad.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/skt-nlp-iad_main.iml" filepath="$PROJECT_DIR$/.idea/modules/skt-nlp-iad_main.iml" group="skt-nlp-iad" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/skt-nlp-iad_test.iml" filepath="$PROJECT_DIR$/.idea/modules/skt-nlp-iad_test.iml" group="skt-nlp-iad" />
+    </modules>
+  </component>
+</project>
