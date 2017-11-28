@@ -1,5 +1,5 @@
 """
-    Named Entity Recognition 
+    Chitchat dialog modeling using Sequence to Sequence framework
 
         Author : Sangkeun Jung (2017)
         - using Tensorflow
@@ -13,12 +13,20 @@ common_path = str(Path( os.path.abspath(__file__) ).parent.parent.parent)
 sys.path.append( common_path )
 
 from common.nlp.vocab import Vocab
-from common.nlp.data_loader import N2NTextData
-from common.nlp.converter import N2NConverter
+from common.nlp.data_loader import N2MTextData
+from common.nlp.converter import N2MConverter
 
-from dataset import NERDataset
+from dataset import ChitchatDataset
 from dataset import load_data
 from common.ml.hparams import HParams
+
+train_data_set = ChitchatDataset(train_id_data, 5, 128, 128)
+train_data_set.unit_test()
+
+import sys; sys.exit()
+
+
+
 
 import numpy as np
 import copy 
@@ -33,26 +41,31 @@ from common.ml.tf.deploy import freeze_graph
 
 
 
+
+
 print( "Tensorflow Version : ", tf.__version__)
 
-class NER():
+class Chitchat():
     def __init__(self, hps, mode="train"):
         self.hps = hps
-        self.x = tf.placeholder(tf.int32,   [None, hps.num_steps], name="pl_tokens")
-        self.y = tf.placeholder(tf.int32,   [None, hps.num_steps], name="pl_target")
-        self.w = tf.placeholder(tf.float32, [None, hps.num_steps], name="pl_weight")
+        self.x = tf.placeholder(tf.int32,    [None, hps.src_num_steps], name="pl_src_tokens")
+        self.y = tf.placeholder(tf.int32,    [None, hps.tar_num_steps], name="pl_tar_tokens")
+        
+        self.sw = tf.placeholder(tf.float32, [None, hps.src_num_steps], name="pl_src_weight")
+        self.tw = tf.placeholder(tf.float32, [None, hps.tar_num_steps], name="pl_tar_weight")
+
         self.keep_prob = tf.placeholder(tf.float32, [], name="pl_keep_prob")
 
         ### 4 blocks ###
         # 1) embedding
         # 2) dropout on input embedding
-        # 3) sentence encoding using rnn
-        # 4) bidirectional rnn's output to target classes
+        # 3) sentence source text encoding using rnn
+        # 4) decoding target text using another rnn
         # 5) loss calcaulation
 
         def _embedding(x):
             # character embedding 
-            shape       = [hps.vocab_size, hps.emb_size]
+            shape       = [hps.src_vocab_size, hps.emb_size]
             initializer = tf.initializers.variance_scaling(distribution="uniform", dtype=tf.float32)
             emb_mat     = tf.get_variable("emb", shape, initializer=initializer, dtype=tf.float32)
             input_emb   = tf.nn.embedding_lookup(emb_mat, x)   # [batch_size, sent_len, emb_dim]
@@ -70,26 +83,28 @@ class NER():
                     step_outputs.append( tf.nn.dropout(input, keep_prob) )
             return step_outputs
 
-        def sequence_encoding_n2n(step_inputs, seq_length, cell_size):
-            # birnn based N2N encoding
+        def sequence_encoding_n21_rnn(step_inputs, cell_size, scope_name):
+            # rnn based N21 encoding (GRU)
+            step_inputs = list( reversed( step_inputs ) )
+            f_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=None)
+            _inputs = tf.stack(step_inputs, axis=1)
+            step_outputs, final_state = tf.contrib.rnn.static_rnn(f_rnn_cell,
+                                                step_inputs,
+                                                dtype=tf.float32,
+                                                scope=scope_name
+                                            )
+            out = step_outputs[-1]
+            return out
+
+        def sequence_decoding_n2n(step_inputs, seq_length, cell_size, scope_name):
+            # rnn based N2N encoding and output
             f_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
-            b_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
             _inputs    = tf.stack(step_inputs, axis=1)
-            outputs, states, = tf.nn.bidirectional_dynamic_rnn( f_rnn_cell,
-                                                                b_rnn_cell,
-                                                                _inputs,
-                                                                sequence_length=tf.cast(seq_length, tf.int64),
-                                                                time_major=False,
-                                                                dtype=tf.float32,
-                                                                scope='birnn',
-                                                            )
-            output_fw, output_bw = outputs
-            states_fw, states_bw = states
-
-            output       = tf.concat([output_fw, output_bw], 2)
-            step_outputs = tf.unstack(output, axis=1)
-
-            final_state  = tf.concat([states_fw, states_bw], 1)
+            step_outputs, final_state = tf.contrib.rnn.static_rnn(f_rnn_cell,
+                                                step_inputs,
+                                                dtype=tf.float32,
+                                                scope=scope_name
+                                            )
             return step_outputs
 
         def _to_class_n2n(step_inputs, num_class):
@@ -116,14 +131,22 @@ class NER():
                                 )
             return loss
         
-        seq_length    = tf.reduce_sum(self.w, 1) # [batch_size]
+        src_seq_length    = tf.reduce_sum(self.sw, 1) # [batch_size]
+        tar_seq_length    = tf.reduce_sum(self.tw, 1) # [batch_size]
 
-        step_inputs       = _embedding(self.x)
-        step_inputs       = _sequence_dropout(step_inputs, self.keep_prob)
-        step_enc_outputs  = sequence_encoding_n2n(step_inputs, seq_length, hps.enc_dim)
-        step_outputs      = _to_class_n2n(step_enc_outputs, hps.num_target_class)
+        # encoding source sentence
+        enc_step_inputs   = _embedding(self.x)
+        enc_step_inputs   = _sequence_dropout(enc_step_inputs, self.keep_prob)
+        sent_encoding     = sequence_encoding_n21_rnn(enc_step_inputs, hps.enc_dim, scope_name="encoder")
 
-        self.loss = _loss(step_outputs, self.y, self.w)
+        # decoding 
+        dec_step_inputs   = [sent_encoding] * hps.tar_num_steps
+        step_outputs      = sequence_decoding_n2n(dec_step_inputs, tar_seq_length, hps.dec_dim, scope_name="decoder")
+
+        # to target text
+        step_outputs      = _to_class_n2n(step_outputs, hps.tar_vocab_size)
+
+        self.loss = _loss(step_outputs, self.y, self.tw)
 
         # step_preds and step_out_probs
         step_out_probs = []
@@ -163,18 +186,24 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
     #
     max_epoch = 300
     model_dir = "./trained_models"
-    hps = NER.get_default_hparams()
+    hps = Chitchat.get_default_hparams()
     hps.update(
                     batch_size= 100,
-                    num_steps = 128,
+
+                    src_num_steps = 128,
+                    tar_num_steps = 128,
+
                     emb_size  = 50,
+                    
                     enc_dim   = 100,
-                    vocab_size=num_vocabs,
-                    num_target_class=num_taget_class
+                    dec_dim   = 100,
+
+                    src_vocab_size=src_num_vocabs,
+                    tar_vocab_size=tar_num_vocabs,
                )
 
     with tf.variable_scope("model"):
-        model = NER(hps, "train")
+        model = Chitchat(hps, "train")
 
     sv = tf.train.Supervisor(is_chief=True,
                              logdir=model_dir,
@@ -188,16 +217,19 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
         local_step       = 0
         prev_global_step = sess.run(model.global_step)
 
-        train_data_set = NERDataset(train_id_data, hps.batch_size, hps.num_steps)
+        train_data_set = ChitchatDataset(train_id_data, hps.batch_size, hps.src_num_steps, hps.tar_num_steps)
         losses = []
         while not sv.should_stop():
             fetches = [model.global_step, model.loss, model.train_op]
             a_batch_data = next( train_data_set.iterator )
-            y, x, w = a_batch_data
+
+            y, x, sw, tw = a_batch_data
+
             fetched = sess.run(fetches, {
-                                            model.x: x, 
-                                            model.y: y, 
-                                            model.w: w,
+                                            model.x:  x, 
+                                            model.y:  y, 
+                                            model.sw: sw,
+                                            model.tw: tw,
 
                                             model.keep_prob: hps.keep_prob,
                                         }
