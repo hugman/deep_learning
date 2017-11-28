@@ -1,0 +1,4 @@
+events.out.tfevents*
+model.ckpt-*
+checkpoint
+graph.pbtxt

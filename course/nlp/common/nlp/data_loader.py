@@ -37,6 +37,29 @@ class N2NItem:
         return list(self.text) 
 
 
+class N2MItem:
+    def __init__(self, src_tokens, tar_tokens):
+        self.src_text   = "".join(src_tokens)
+        self.tar_text   = "".join(tar_tokens)
+
+        self.src_token_txts = src_tokens
+        self.tar_token_txts = tar_tokens
+
+        self.src_token_ids   = None  # it should be array 
+        self.tar_token_ids   = None  # it should be array 
+
+    def set_id(self, src_token_ids, tar_token_ids):
+        self.src_token_ids = src_token_ids
+        self.tar_token_ids = tar_token_ids
+
+    def get_src_tokens(self):
+        # currently, only support 'character' 
+        return list(self.src_text) 
+
+    def get_tar_tokens(self):
+        # currently, only support 'character' 
+        return list(self.tar_text)
+    
 
 class N21TextData:
     def __init__(self, src=None, mode='file'):  # mode = 'file' | 'sentence'
@@ -114,8 +137,52 @@ class N2NTextData:
                 targets.append( tag ) 
 
 
-    
+class N2MTextData:
+    def __init__(self, src=None, mode='file'):  # mode = 'file' | 'sentence'
+        self.data = []
+        
+        if mode == 'file':      self.load_text_file_data(src)
+        if mode == 'sentence':  self.load_text_data(src)
 
+    def add_to_data(self, src_tokens, tar_tokens):
+        # normalize
+        self.data.append( N2MItem(src_tokens, tar_tokens) )
 
-    
+    def load_text_data(self, line):
+        # mode = 'sentence'
+        line = line.rstrip('\n\r')
+        
+        # line = source_text \t target_text
+        fields = line.split('\t')
+        
+        if len(fields) == 2:
+            src_text, tar_text = fields[0], fields[1]
+
+            src_tokens = list(src_text)
+            tar_tokens = list(tar_text)
+            self.add_to_data(src_tokens, tar_tokens)
+        if len(fields) == 1:
+            src_text = fields[0]
+
+            src_tokens = list(src_text)
+            tar_tokens = [ 'O' for x in src_tokens ] 
+            self.add_to_data(src_tokens, tar_tokens)
+
+    def load_text_file_data(self, fn):
+        # mode = 'file' 
+        with codecs.open(fn, 'r', encoding='utf-8') as f:
+            src_tokens  = []
+            tar_tokens  = []
+
+            for line in f:
+                line = line.rstrip('\n\r')
+
+                fields = line.split('\t')
+
+                src_text, tar_text = fields[0], fields[1]
+
+                src_tokens = list(src_text)
+                tar_tokens = list(tar_text)
+
+                self.add_to_data(src_tokens, tar_tokens)
 

@@ -4,7 +4,7 @@ import random
 
 
 class Dataset():
-    def __init__(self, id_data, batch_size, num_steps, pad_id=1, target_null_id=0, deterministic=False):
+    def __init__(self, id_data, batch_size, num_steps, target_num_step=None, pad_id=1, target_null_id=0, deterministic=False):
         self.data            = id_data       # it should be id-based data
         
         self.token_pad_id    = pad_id
@@ -12,6 +12,10 @@ class Dataset():
 
         self.batch_size      = batch_size
         self.num_steps       = num_steps
+
+        self.src_num_steps   = num_steps
+        self.tar_num_steps   = target_num_step  # for sequence to sequence dataset
+
         self.deterministic   = deterministic  # if deterministic is True, data is shuffled and retrieved
         self.iterator           = self.iterate_forever()
         self.predict_iterator   = self.iterate_once()
