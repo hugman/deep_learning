@@ -159,13 +159,14 @@ class N2MTextData:
             src_text, tar_text = fields[0], fields[1]
 
             src_tokens = list(src_text)
-            tar_tokens = list(tar_text)
+            tar_tokens = list(tar_text) + ['_EOS']
             self.add_to_data(src_tokens, tar_tokens)
+
         if len(fields) == 1:
             src_text = fields[0]
 
             src_tokens = list(src_text)
-            tar_tokens = [ 'O' for x in src_tokens ] 
+            tar_tokens = [ '_EOS' for x in range(128) ] 
             self.add_to_data(src_tokens, tar_tokens)
 
     def load_text_file_data(self, fn):
@@ -182,7 +183,6 @@ class N2MTextData:
                 src_text, tar_text = fields[0], fields[1]
 
                 src_tokens = list(src_text)
-                tar_tokens = list(tar_text)
-
+                tar_tokens = list(tar_text) + ['_EOS']
                 self.add_to_data(src_tokens, tar_tokens)
 

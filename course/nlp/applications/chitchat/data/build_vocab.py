@@ -44,7 +44,8 @@ def load_all_dump_vocab(fns):
 
     tar_dict = [
                 '_UNK',
-                '_PAD'
+                '_PAD',
+                '_EOS'   # special symbol for end of sequence
                ]
 
 

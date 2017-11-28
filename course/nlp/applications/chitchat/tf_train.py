@@ -20,14 +20,6 @@ from dataset import ChitchatDataset
 from dataset import load_data
 from common.ml.hparams import HParams
 
-train_id_data, src_token_vocab, tar_token_vocab = load_data()
-train_data_set = ChitchatDataset(train_id_data, 5, 128, 128)
-train_data_set.unit_test()
-
-import sys; sys.exit()
-
-
-
 
 import numpy as np
 import copy 
@@ -39,9 +31,6 @@ from tensorflow.python.ops import variable_scope
 from tensorflow.contrib.seq2seq import sequence_loss
 
 from common.ml.tf.deploy import freeze_graph
-
-
-
 
 
 print( "Tensorflow Version : ", tf.__version__)
@@ -255,18 +244,18 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
     freeze_graph(model_dir, "model/step_out_preds,model/step_out_probs", "frozen_graph.tf.pb") ## freeze graph with params to probobuf format
     
 from tensorflow.core.framework import graph_pb2
-def predict(token_vocab, target_vocab, sent):
+def predict(src_token_vocab, tar_token_vocab, sent):
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # force to use cpu only (prediction)
     model_dir = "./trained_models"
 
     # prepare sentence converting
     # to make raw sentence to id data easily
-    pred_data     = N2NTextData(sent, mode='sentence')
-    pred_id_data  = N2NConverter.convert(pred_data, target_vocab, token_vocab)
-    pred_data_set = NERDataset(pred_id_data, 1, 128)
+    pred_data     = N2MTextData(sent, mode='sentence')
+    pred_id_data  = N2MConverter.convert(pred_data, src_token_vocab, tar_token_vocab)
+    pred_data_set = ChitchatDataset(pred_id_data, 1, 128, 128)
     #
     a_batch_data = next(pred_data_set.predict_iterator) # a result
-    b_nes_id, b_token_ids, b_weight = a_batch_data
+    b_src_token_ids, b_tar_token_ids, b_src_weight, b_tar_weight = a_batch_data
 
     # Restore graph
     # note that frozen_graph.tf.pb contains graph definition with parameter values in binary format
@@ -283,9 +272,9 @@ def predict(token_vocab, target_vocab, sent):
         #for n in tf.get_default_graph().as_graph_def().node: print(n.name)
 
         # make interface for input
-        pl_token     = graph.get_tensor_by_name('import/model/pl_tokens:0')
-        pl_weight    = graph.get_tensor_by_name('import/model/pl_weight:0')
-        pl_keep_prob = graph.get_tensor_by_name('import/model/pl_keep_prob:0')
+        pl_src_token     = graph.get_tensor_by_name('import/model/pl_src_tokens:0')
+        pl_src_weight    = graph.get_tensor_by_name('import/model/pl_src_weight:0')
+        pl_keep_prob     = graph.get_tensor_by_name('import/model/pl_keep_prob:0')
 
         # make interface for output
         step_out_preds = graph.get_tensor_by_name('import/model/step_out_preds:0')
@@ -295,24 +284,24 @@ def predict(token_vocab, target_vocab, sent):
         # predict sentence 
         b_best_step_pred_indexs, b_step_pred_probs = sess.run([step_out_preds, step_out_probs], 
                                                               feed_dict={
-                                                                            pl_token  : b_token_ids,
-                                                                            pl_weight : b_weight,
+                                                                            pl_src_token  : b_src_token_ids,
+                                                                            pl_tar_weight : b_tar_weight,
                                                                             pl_keep_prob : 1.0,
                                                                         }
                                                              )
         best_step_pred_indexs = b_best_step_pred_indexs[0]
-        step_pred_probs = b_step_pred_probs[0]
+        step_pred_probs       = b_step_pred_probs[0]
 
-        step_best_targets = []
+        step_best_targets      = []
         step_best_target_probs = []
         for time_step, best_pred_index in enumerate(best_step_pred_indexs):
-            _target_class = target_vocab.get_symbol(best_pred_index)
-            step_best_targets.append( _target_class )
+            _target_symbol = target_vocab.get_symbol(best_pred_index)
+            step_best_targets.append( _target_symbol )
             _prob = step_pred_probs[time_step][best_pred_index]
             step_best_target_probs.append( _prob ) 
 
-        for idx, char in enumerate(list(sent)):
-            print('{}\t{}\t{}'.format(char, step_best_targets[idx], step_best_target_probs[idx]) ) 
+        print("Input  : ", sent)
+        print("Output : ", step_best_targets)
 
 
 
@@ -321,7 +310,7 @@ if __name__ == '__main__':
     src_num_vocabs = src_token_vocab.get_num_tokens()
     tar_num_vocabs = tar_token_vocab.get_num_tokens()
 
-    train_data_set = ChitchatDataset(train_id_data, 5, 128, 128)
+    train_data_set = ChitchatDataset(train_id_data, 100, 128, 128)
 
     train(train_id_data, src_num_vocabs, tar_num_vocabs)
     

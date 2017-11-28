@@ -71,7 +71,7 @@ class NER():
             return step_outputs
 
         def sequence_encoding_n2n(step_inputs, seq_length, cell_size):
-            # birnn based N2N encoding
+            # birnn based N2N encoding and output
             f_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
             b_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
             _inputs    = tf.stack(step_inputs, axis=1)

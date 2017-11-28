@@ -6,7 +6,7 @@ tag_pat = re.compile(r'[<]([^>]*)[>]([^<]*)[<]\/([^>]*)[>]') # <> only
 
 def parse_a_line(line, with_2nd_level=False):
     # Read a sentence and return parsed data
-    # input  : <BN:TRS>301</BN:TRS> <TT:TRS>¹ö½º</TT:TRS> <INFO_TYPE:INFO_TYPE>³ë¼±</INFO_TYPE:INFO_TYPE> ¾Ë·ÁÁà
+    # input  : <BN:TRS>301</BN:TRS> <TT:TRS>ï¿½ï¿½ï¿½ï¿½</TT:TRS> <INFO_TYPE:INFO_TYPE>ï¿½ë¼±</INFO_TYPE:INFO_TYPE> ï¿½Ë·ï¿½ï¿½ï¿½
     #        --> < 1st_level_tag | 2nd_level_Tag >
     # output : python object
         
@@ -23,8 +23,8 @@ def parse_a_line(line, with_2nd_level=False):
 
     from itertools import repeat
     def pad(input, maxlen):
-        # list input À» maxlen ¸¸Å­ padding ÇÑ´Ù
-        # ºó °÷Àº None À¸·Î Ã¤¿ò
+        # list input ï¿½ï¿½ maxlen ï¿½ï¿½Å­ padding ï¿½Ñ´ï¿½
+        # ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ None ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½
         input.extend(repeat(None, maxlen - len(input)))
         return input
 
