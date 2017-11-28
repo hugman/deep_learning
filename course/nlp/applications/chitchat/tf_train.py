@@ -85,17 +85,23 @@ class Chitchat():
                                             )
             out = step_outputs[-1]
             return out
-
+        
         def sequence_decoding_n2n(step_inputs, seq_length, cell_size, scope_name):
             # rnn based N2N encoding and output
             f_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
             _inputs    = tf.stack(step_inputs, axis=1)
-            step_outputs, final_state = tf.contrib.rnn.static_rnn(f_rnn_cell,
-                                                step_inputs,
-                                                dtype=tf.float32,
-                                                scope=scope_name
-                                            )
+            outputs, states, = tf.nn.dynamic_rnn(   f_rnn_cell,
+                                                    _inputs,
+                                                    sequence_length=tf.cast(seq_length, tf.int64),
+                                                    time_major=False,
+                                                    dtype=tf.float32,
+                                                    scope='rnn',
+                                                )
+            step_outputs = tf.unstack(outputs, axis=1)
             return step_outputs
+
+
+        
 
         def _to_class_n2n(step_inputs, num_class):
             T = len(step_inputs)
@@ -155,7 +161,8 @@ class Chitchat():
         self.global_step = tf.get_variable("global_step", [], tf.int32, initializer=tf.zeros_initializer, trainable=False)
 
         if mode == "train":
-            optimizer       = tf.train.AdamOptimizer(hps.learning_rate)
+            #optimizer       = tf.train.AdamOptimizer(hps.learning_rate)
+            optimizer       = tf.train.RMSPropOptimizer(hps.learning_rate)
             self.train_op   = optimizer.minimize(self.loss, global_step=self.global_step)
         else:
             self.train_op = tf.no_op()
@@ -165,7 +172,7 @@ class Chitchat():
     @staticmethod
     def get_default_hparams():
         return HParams(
-            learning_rate     = 0.001,
+            learning_rate     = 0.05,
             keep_prob         = 0.5,
         )
 
