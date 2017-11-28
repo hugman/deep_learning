@@ -3,7 +3,8 @@ Sentiment Analysis DNN code
 Author : Sangkeun Jung 
 
 - This code contains 
-	- basic concept of buliding DNN for N21 problem [ "TUTORIAL" purpose only ] 
+	- basic concept of buliding DNN for N21 problem ("TUTORIAL" purpose only)
+
 	- application is sentiment anlaysis 
 
 	- input sequence  : user sentence

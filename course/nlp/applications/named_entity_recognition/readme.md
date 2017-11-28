@@ -3,7 +3,8 @@ Named Entity Recognition DNN code
 Author : Sangkeun Jung 
 
 - This code contains 
-	- basic concept of buliding DNN for N2N problem [ "TUTORIAL" purpose only ] 
+	- basic concept of buliding DNN for N2N problem ("TUTORIAL" purpose only)
+
 	- application is named entity recognition 
 
 	- input sequence  : user sentence

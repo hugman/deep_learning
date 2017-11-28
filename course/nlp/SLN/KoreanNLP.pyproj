@@ -54,11 +54,14 @@
     <Content Include="applications\named_entity_recognition\data\readme.md" />
     <Content Include="applications\named_entity_recognition\readme.md" />
     <Content Include="applications\named_entity_recognition\trained_models\.gitignore" />
+    <Content Include="applications\sentiment_analysis\data\readme.md" />
     <Content Include="applications\sentiment_analysis\data\small.train.sent_data.txt" />
     <Content Include="applications\sentiment_analysis\data\target.vocab.txt" />
     <Content Include="applications\sentiment_analysis\data\test.sent_data.txt" />
     <Content Include="applications\sentiment_analysis\data\token.vocab.txt" />
     <Content Include="applications\sentiment_analysis\data\train.sent_data.txt" />
+    <Content Include="applications\sentiment_analysis\readme.md" />
+    <Content Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="applications\" />

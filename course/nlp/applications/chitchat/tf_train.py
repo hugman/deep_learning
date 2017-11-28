@@ -174,7 +174,7 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
     #
     # train sentiment analysis using given train_id_data
     #
-    max_epoch = 300
+    max_epoch = 100
     model_dir = "./trained_models"
     hps = Chitchat.get_default_hparams()
     hps.update(
@@ -194,7 +194,7 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
 
     with tf.variable_scope("model"):
         model = Chitchat(hps, "train")
-
+    
     sv = tf.train.Supervisor(is_chief=True,
                              logdir=model_dir,
                              summary_op=None,  
@@ -239,6 +239,7 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
 
         print("Training is done.")
     sv.stop()
+    
 
     # model.out_pred, model.out_probs
     freeze_graph(model_dir, "model/step_out_preds,model/step_out_probs", "frozen_graph.tf.pb") ## freeze graph with params to probobuf format
@@ -273,7 +274,8 @@ def predict(src_token_vocab, tar_token_vocab, sent):
 
         # make interface for input
         pl_src_token     = graph.get_tensor_by_name('import/model/pl_src_tokens:0')
-        pl_src_weight    = graph.get_tensor_by_name('import/model/pl_src_weight:0')
+        #pl_src_weight    = graph.get_tensor_by_name('import/model/pl_src_weight:0')
+        #pl_tar_weight    = graph.get_tensor_by_name('import/model/pl_tar_weight:0')
         pl_keep_prob     = graph.get_tensor_by_name('import/model/pl_keep_prob:0')
 
         # make interface for output
@@ -285,7 +287,7 @@ def predict(src_token_vocab, tar_token_vocab, sent):
         b_best_step_pred_indexs, b_step_pred_probs = sess.run([step_out_preds, step_out_probs], 
                                                               feed_dict={
                                                                             pl_src_token  : b_src_token_ids,
-                                                                            pl_tar_weight : b_tar_weight,
+                                                                            #pl_tar_weight : b_tar_weight,
                                                                             pl_keep_prob : 1.0,
                                                                         }
                                                              )
@@ -295,7 +297,7 @@ def predict(src_token_vocab, tar_token_vocab, sent):
         step_best_targets      = []
         step_best_target_probs = []
         for time_step, best_pred_index in enumerate(best_step_pred_indexs):
-            _target_symbol = target_vocab.get_symbol(best_pred_index)
+            _target_symbol = tar_token_vocab.get_symbol(best_pred_index)
             step_best_targets.append( _target_symbol )
             _prob = step_pred_probs[time_step][best_pred_index]
             step_best_target_probs.append( _prob ) 
@@ -314,5 +316,4 @@ if __name__ == '__main__':
 
     train(train_id_data, src_num_vocabs, tar_num_vocabs)
     
-    #predict(token_vocab, target_vocab, '의정지기단은 첫 사업으로 45 명 시의원들의 선거 공약을 수집해 개인별로 카드를 만들었다.')
-    #predict(token_vocab, target_vocab, '한국소비자보호원은 19일 시판중인 선물세트의 상당수가 과대 포장된 것으로 드러났다고 밝혔다.')
+    predict(src_token_vocab, tar_token_vocab, '그럼 날 웃겨봐')
