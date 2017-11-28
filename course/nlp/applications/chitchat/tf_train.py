@@ -20,6 +20,7 @@ from dataset import ChitchatDataset
 from dataset import load_data
 from common.ml.hparams import HParams
 
+train_id_data, src_token_vocab, tar_token_vocab = load_data()
 train_data_set = ChitchatDataset(train_id_data, 5, 128, 128)
 train_data_set.unit_test()
 
@@ -223,7 +224,8 @@ def train(train_id_data, src_num_vocabs, tar_num_vocabs):
             fetches = [model.global_step, model.loss, model.train_op]
             a_batch_data = next( train_data_set.iterator )
 
-            y, x, sw, tw = a_batch_data
+            x, y, sw, tw = a_batch_data
+
 
             fetched = sess.run(fetches, {
                                             model.x:  x, 

@@ -12,59 +12,70 @@ import copy
 class ChitchatDataset(Dataset):
     def _iterate(self, index_gen):
         B = self.batch_size
-        N = self.num_steps
+
+        SN = self.src_num_steps
+        TN = self.tar_num_steps
 
         # vectorize id data
-        ne         = np.zeros([B, N], np.int64)    # y 
-        token      = np.zeros([B, N], np.int64)    # x
-        weight     = np.zeros([B, N], np.float32)  # w
+        src_token  = np.zeros([B, SN], np.int64)    # x
+        tar_token  = np.zeros([B, TN], np.int64)    # y 
+        
+        src_weight = np.zeros([B, SN], np.float32)  # sw
+        tar_weight = np.zeros([B, TN], np.float32)  # tw
 
         while True:
-            ne[:]         = 0
-            token[:]      = 0
-            weight[:]     = 0
+            src_token[:]      = 0
+            tar_token[:]      = 0
+
+            src_weight[:]     = 0
+            tar_weight[:]     = 0
 
             for b in range(B):
                 try:
                     while True:
                         index = next(index_gen)
-                        _num_steps = len( self.data[index].token_ids )
-                        if _num_steps <= N: break 
+                        src_num_steps = len( self.data[index].src_token_ids )
+                        tar_num_steps = len( self.data[index].tar_token_ids )
 
-                    _ne_ids       = copy.deepcopy( self.data[index].target_ids )
+                        if src_num_steps <= SN and tar_num_steps <= TN: break 
 
-                    _token_ids    = copy.deepcopy( self.data[index].token_ids )
+                    src_token_ids    = copy.deepcopy( self.data[index].src_token_ids )
+                    tar_token_ids    = copy.deepcopy( self.data[index].tar_token_ids )
 
-                    # fill pad for weight
-                    _weight_ids   = [0] * self.num_steps
-                    for _idx, _ in enumerate(_token_ids): _weight_ids[_idx] = 1
+                    # fill pad for src_weight
+                    src_weight_ids = [0] * self.src_num_steps
+                    for _idx, _ in enumerate(src_token_ids): src_weight_ids[_idx] = 1
 
-                    # fill O id to target
-                    _ne_ids += [self.target_null_id] * ( self.num_steps - len( _token_ids ) ) 
+                    # fill pad for tar_weight
+                    tar_weight_ids = [0] * self.tar_num_steps
+                    for _idx, _ in enumerate(tar_token_ids): tar_weight_ids[_idx] = 1
 
-                    # fill pad to token
-                    _token_ids += [self.token_pad_id] * ( self.num_steps - len( _token_ids ) ) 
-
-                    # output
-                    ne[b] = _ne_ids
 
                     # input
-                    token[b]  = _token_ids
-                    weight[b] = _weight_ids
-                    ne[b]     = _ne_ids
+                    # fill pad to src token
+                    src_token_ids += [self.token_pad_id] * ( self.src_num_steps - len( src_token_ids ) ) 
+
+                    # output
+                    # fill pad to tar token
+                    tar_token_ids += [self.token_pad_id] * ( self.tar_num_steps - len( tar_token_ids ) ) 
+
+                    # input
+                    src_token[b] = src_token_ids
+                    tar_token[b] = tar_token_ids
+
+                    src_weight[b] = src_weight_ids
+                    tar_weight[b] = tar_weight_ids
 
                 except StopIteration:
                     pass
-            if not np.any(weight):
+            if not ( np.any(src_weight) or np.any(tar_weight) ):
                 return
-            yield ne, token, weight  # tuple for (target, input)
+            yield src_token, tar_token, src_weight, tar_weight
 
     def unit_test(self):
         a_batch_data = next(self.iterator)
-        y, x, w = a_batch_data
-        print(y,x,w)
-
-
+        x, y, sw, tw = a_batch_data
+        print(x, y, sw, tw)
 
 
 def load_data():
