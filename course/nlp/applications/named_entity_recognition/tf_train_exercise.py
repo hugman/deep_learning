@@ -6,11 +6,12 @@
         - using Tensorflow
 """
 
-import sys, os
+import sys, os, inspect
 
 # add common to path
 from pathlib import Path
-common_path = str(Path( os.path.abspath(__file__) ).parent.parent.parent)
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+common_path = str(Path(currentdir).parent.parent)
 sys.path.append( common_path )
 
 from common.nlp.vocab import Vocab
