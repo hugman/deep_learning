@@ -8,12 +8,11 @@ This repo. contains following sub-tutorials and projects
     - Applications
         - Sentiment Analysis (N21 Problem)
         - Named Entity Recognition (N2N problem) 
-        - Chitchat modeling (N2M Problem)
 
 	- All of the code are comes with detail lecture in following blog.
 		- for Korean
-			- http://hugman.re.kr/implementation/%EC%9E%90%EC%97%B0%EC%96%B4%EC%B2%98%EB%A6%AC/
-
+                        - sentiment : http://www.hugman.re.kr/blog/sentiment_analysis/ 
+                        - named entity recognition : http://hugman.re.kr/blog/ner/
         
     - Common
         - common utils and helper functions for deep learning NLP
