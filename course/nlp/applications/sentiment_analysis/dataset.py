@@ -64,8 +64,8 @@ def load_data():
     target_vocab    = Vocab(target_vocab_fn, mode='target')
 
     # load train data 
-    train_data_fn  = os.path.join( os.path.dirname(__file__), 'data', 'train.sent_data.txt')
-    #train_data_fn  = os.path.join( os.path.dirname(__file__), 'data', 'small.train.sent_data.txt')
+    #train_data_fn  = os.path.join( os.path.dirname(__file__), 'data', 'train.sent_data.txt')
+    train_data_fn  = os.path.join( os.path.dirname(__file__), 'data', 'small.train.sent_data.txt')
     train_txt_data = N21TextData(train_data_fn)
 
     # convert text data to id data

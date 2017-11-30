@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{dc1f90e6-353e-43fe-9693-ddaf7007026a}</ProjectGuid>
     <ProjectHome>..\</ProjectHome>
-    <StartupFile>applications\chitchat\tf_train.py</StartupFile>
+    <StartupFile>applications\sentiment_analysis\tf_train.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

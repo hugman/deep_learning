@@ -4,6 +4,7 @@ Author : Sangkeun Jung
 
 - This code contains 
 	- basic concept of buliding DNN for N2N problem ("TUTORIAL" purpose only)
+        - Lecture Blog : http://hugman.re.kr/blog/ner/
 
 	- application is named entity recognition 
 

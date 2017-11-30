@@ -1,5 +1,0 @@
-/__pycache__/
-*.pyc
-/log_dir/*
-/log_dir/*/*
-_out.txt

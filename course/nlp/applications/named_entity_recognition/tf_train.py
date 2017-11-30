@@ -5,11 +5,12 @@
         - using Tensorflow
 """
 
-import sys, os
+import sys, os, inspect
 
 # add common to path
 from pathlib import Path
-common_path = str(Path( os.path.abspath(__file__) ).parent.parent.parent)
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+common_path = str(Path(currentdir).parent.parent)
 sys.path.append( common_path )
 
 from common.nlp.vocab import Vocab
@@ -75,6 +76,10 @@ class NER():
             f_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
             b_rnn_cell = tf.contrib.rnn.GRUCell(cell_size, reuse=False)
             _inputs    = tf.stack(step_inputs, axis=1)
+
+            # step_inputs = a list of [batch_size, emb_dim]
+            # input = [batch_size, num_step, emb_dim]
+            # np.stack( [a,b,c,] )
             outputs, states, = tf.nn.bidirectional_dynamic_rnn( f_rnn_cell,
                                                                 b_rnn_cell,
                                                                 _inputs,
@@ -84,13 +89,13 @@ class NER():
                                                                 scope='birnn',
                                                             )
             output_fw, output_bw = outputs
-            states_fw, states_bw = states
+            states_fw, states_bw = states 
 
             output       = tf.concat([output_fw, output_bw], 2)
             step_outputs = tf.unstack(output, axis=1)
 
             final_state  = tf.concat([states_fw, states_bw], 1)
-            return step_outputs
+            return step_outputs # a list of [batch_size, enc_dim]
 
         def _to_class_n2n(step_inputs, num_class):
             T = len(step_inputs)
@@ -152,7 +157,7 @@ class NER():
     @staticmethod
     def get_default_hparams():
         return HParams(
-            learning_rate     = 0.001,
+            learning_rate     = 0.01,
             keep_prob         = 0.5,
         )
 
@@ -287,8 +292,8 @@ if __name__ == '__main__':
     num_vocabs       = token_vocab.get_num_tokens()
     num_target_class = target_vocab.get_num_targets()
 
-    train_data_set = NERDataset(train_id_data, 5, 128)
-    train(train_id_data, num_vocabs, num_target_class)
+    #train_data_set = NERDataset(train_id_data, 5, 128)
+    #train(train_id_data, num_vocabs, num_target_class)
     
     predict(token_vocab, target_vocab, '의정지기단은 첫 사업으로 45 명 시의원들의 선거 공약을 수집해 개인별로 카드를 만들었다.')
     predict(token_vocab, target_vocab, '한국소비자보호원은 19일 시판중인 선물세트의 상당수가 과대 포장된 것으로 드러났다고 밝혔다.')
