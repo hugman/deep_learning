@@ -19,7 +19,7 @@ This repo. contains following sub-tutorials and projects
 
     - Requirements:
         - Python 3.6
-        - Tensorflow 1.3
+        - Tensorflow 1.3 (works fine under TF 1.8)
         - (optinal) PyTorch 0.2
 
 

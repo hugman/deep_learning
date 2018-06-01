@@ -292,8 +292,8 @@ if __name__ == '__main__':
     num_vocabs       = token_vocab.get_num_tokens()
     num_target_class = target_vocab.get_num_targets()
 
-    #train_data_set = NERDataset(train_id_data, 5, 128)
-    #train(train_id_data, num_vocabs, num_target_class)
+    train_data_set = NERDataset(train_id_data, 5, 128)
+    train(train_id_data, num_vocabs, num_target_class)
     
     predict(token_vocab, target_vocab, '의정지기단은 첫 사업으로 45 명 시의원들의 선거 공약을 수집해 개인별로 카드를 만들었다.')
     predict(token_vocab, target_vocab, '한국소비자보호원은 19일 시판중인 선물세트의 상당수가 과대 포장된 것으로 드러났다고 밝혔다.')
